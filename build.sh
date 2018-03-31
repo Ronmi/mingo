@@ -48,4 +48,4 @@ rm -fr img/usr
 
 # build image
 docker build -t "$T" img
-docker push
+docker push "$T"

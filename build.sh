@@ -4,6 +4,7 @@ rm -fr img/usr img/etc img/lib img/lib64
 
 S=http://deb.debian.org/debian
 T=ronmi/mingo
+A=amd64
 
 if [[ $REPO != "" ]]
 then
@@ -12,6 +13,14 @@ fi
 if [[ $TAG != "" ]]
 then
     T="$TAG"
+fi
+if [[ $ARCH != "" ]]
+then
+    A="$ARCH"
+fi
+if [[ $NO64 != "" ]]
+then
+    OPT="-f img/Dockerfile.no64"
 fi
 
 echo "using repository $S"
@@ -35,7 +44,7 @@ function inst {
 }
 
 inst all ca-certificates
-inst amd64 libc6
+inst "$A" libc6
 
 
 # move certificates
@@ -47,5 +56,5 @@ done
 rm -fr img/usr
 
 # build image
-docker build -t "$T" img
+docker build $OPT -t "$T" img
 docker push "$T"

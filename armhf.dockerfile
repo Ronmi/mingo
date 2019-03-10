@@ -1,4 +1,4 @@
-FROM arm32v7/debian:stable-slim as builder
+FROM debian:stable-slim as builder
 
 ADD build.sh /usr/bin/
 ADD deps.sh /usr/bin/

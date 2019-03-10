@@ -1,6 +1,0 @@
-FROM scratch
-MAINTAINER Ronmi Ren <ronmi.ren@gmail.com>
-
-ADD etc /etc
-ADD lib /lib
-ADD lib64 /lib64

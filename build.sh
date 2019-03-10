@@ -3,24 +3,15 @@
 rm -fr img/usr img/etc img/lib img/lib64
 
 S=http://deb.debian.org/debian
-T=ronmi/mingo
 A=amd64
 
 if [[ $REPO != "" ]]
 then
     S="$REPO"
 fi
-if [[ $TAG != "" ]]
-then
-    T="$TAG"
-fi
 if [[ $ARCH != "" ]]
 then
     A="$ARCH"
-fi
-if [[ $NO64 != "" ]]
-then
-    OPT="-f img/Dockerfile.no64"
 fi
 
 echo "using repository $S"
@@ -55,6 +46,3 @@ do
 done
 rm -fr img/usr
 
-# build image
-docker build $OPT -t "$T" img
-docker push "$T"

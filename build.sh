@@ -36,7 +36,7 @@ function inst {
 
 inst all ca-certificates
 inst "$A" libc6
-
+inst all tzdata
 
 # move certificates
 for i in `find img/usr/share/ca-certificates -name '*.crt'`
@@ -44,5 +44,5 @@ do
     fn=$(basename "$i" | sed 's/\.crt/.pem/')
     mv "$i" "img/etc/ssl/certs/$fn"
 done
-rm -fr img/usr
+rm -fr img/usr/{lib,libexec,bin,sbin,games,include,src}
 

@@ -1,30 +1,51 @@
-Automatically build minimal Debian GNU/Linux image for running Go binaries.
+Automatically build minimal image for running Go binaries, based on Debian stable.
+
+# Intro
+
+```dockerfile
+FROM golang AS builder
+RUN mkdir /src /app /app/data
+WORKDIR /src
+RUN --mount=type=bind,target=. go build -o /app/my-app
+
+FROM ronmi/mingo
+COPY --from=builder /app /app
+WORKDIR /app
+ENTRYPOINT ["/app/my-app"]
+```
+
+**YOU CAN NOT RUN ANY COMMAND** at final stage.
+
+### Pros
+
+- Really small (~2mb)
+- No executables in it, increases security
+- Debian based, one of the most stable distro on earth
+
+### Cons
+
+- Hard to extend (no apt/dpkg tools in it)
+- Hard to debug (no debugger/less/vim/... in it)
+- You can't even mkdir in it (lmao)
 
 # What's in it
 
 - libc6
 - ca-certificates
+- tzdata (use it with volumes like `-v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro`)
+
+That's all.
 
 # FAQ
 
 ### How to build testing/unstable image
 
-Edit `build.sh`.
+Edit `build.sh`, change the line `V=stable`.
 
 ### What if I need package X?
 
-`build.sh` provides a helper function to download and extract packages (using `wget` and `dpkg-deb -x`)
+For simple package that all dependencies are fulfilled, just add it to `build.sh`. There is a place for you to add packages.
 
-```sh
-# inst arch pkgname
-inst amd64 wget
-```
+There is also a tool `deps.sh` can query required packages using `apt-cache`. You should try `./deps.sh wget` once.
 
-And a helper to recursively extract package dependencies with `apt-cache`
-
-```sh
-# only required packages are shown
-./deps.sh wget curl
-```
-
-Some packages will not work properly without valid config, which was mostly in post-install script. Now you have to handle it yourself.
+Some package will not work without properly configurated. You have to handle it by yourself, or just use distro image instead.

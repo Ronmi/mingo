@@ -17,9 +17,11 @@ fi
 echo "using repository $S"
 echo "commit as $T"
 
+pkgs="$(wget -q -O - "${S}/dists/stable/main/binary-${A}/Packages.gz" | zcat)"
+
 function inst {
     rm -f dest.deb
-    DEB="${S}/$(wget -q -O - "${S}/dists/stable/main/binary-${1}/Packages.gz" | zcat | grep -F "${2}_" | grep -F Filename | cut -d ' ' -f 2)"
+    DEB="${S}/$(echo "$pkgs" | grep -F "/${2}_" | grep -F Filename | cut -d ' ' -f 2)"
 
     echo "Downloading $DEB"
     wget -q -O dest.deb "$DEB"

@@ -1,9 +1,11 @@
 #!/bin/bash
 
-rm -fr img/usr img/etc img/lib img/lib64
+rm -fr img || true
+mkdir img
 
 S=http://deb.debian.org/debian
 A=amd64
+V=stable
 
 if [[ $REPO != "" ]]
 then
@@ -15,9 +17,9 @@ then
 fi
 
 echo "using repository $S"
-echo "commit as $T"
+echo "use verion $V and architecture $A"
 
-pkgs="$(wget -q -O - "${S}/dists/stable/main/binary-${A}/Packages.gz" | zcat)"
+pkgs="$(wget -q -O - "${S}/dists/${V}/main/binary-${A}/Packages.gz" | zcat)"
 
 function inst {
     rm -f dest.deb
@@ -36,9 +38,13 @@ function inst {
     rm dest.deb
 }
 
-inst all ca-certificates
-inst "$A" libc6
+inst all ca-certificates  # use "all" to install arch independent package
+inst "$A" libc6           # use "$A" for arch dependent package
 inst all tzdata
+
+# add custom packge here
+# example:
+# inst "$A" libssl1.1
 
 # move certificates
 for i in `find img/usr/share/ca-certificates -name '*.crt'`
@@ -46,5 +52,7 @@ do
     fn=$(basename "$i" | sed 's/\.crt/.pem/')
     mv "$i" "img/etc/ssl/certs/$fn"
 done
-rm -fr img/usr/{lib,libexec,bin,sbin,games,include,src}
 
+# remove unneeded files
+# take extra care if you have installed some other packages
+rm -fr img/usr/{lib,libexec,bin,sbin,games,include,src,share/doc,share/man}

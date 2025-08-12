@@ -1,0 +1,58 @@
+on:
+  push:
+
+jobs:
+  docker-hub:
+    runs-on: any
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - run: sed -i 's#V=stable#V=bookworm#' build.sh
+      - name: Login to docker
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USER }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+      - name: Prepare amd64
+        run: |
+          rm -fr img || true
+          mkdir img
+          ARCH=amd64 ./build.sh
+      - name: Build amd64
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: ronmi/mingo:bookworm-amd64
+      - name: Prepare arm64
+        run: |
+          rm -fr img || true
+          mkdir img
+          ARCH=arm64 ./build.sh
+      - name: Build arm64
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/arm64
+          push: true
+          tags: ronmi/mingo:bookworm-arm64
+      - name: Prepare armhf
+        run: |
+          rm -fr img || true
+          mkdir img
+          ARCH=armhf ./build.sh
+      - name: Build armhf
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/arm/v7
+          push: true
+          tags: ronmi/mingo:bookworm-armhf
+          build-args: |
+            REPO=http://ftp.tw.debian.org/debian
+            ARCH=armhf
+      - name: Create multiarch image
+        run: |
+          docker buildx imagetools create -t ronmi/mingo:bookworm ronmi/mingo:bookworm-amd64 ronmi/mingo:bookworm-arm64 ronmi/mingo:bookworm-armhf
+          

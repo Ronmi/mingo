@@ -55,4 +55,4 @@ done
 
 # remove unneeded files
 # take extra care if you have installed some other packages, eg. libssl
-rm -fr img/usr/{lib,libexec,bin,sbin,games,include,src,share/doc,share/man}
+rm -fr img/usr/{bin,sbin,games,include,src,share/doc,share/man}
